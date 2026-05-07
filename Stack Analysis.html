@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSA & Resource Management Consolidation Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Energetic & Playful (Magenta #EC4899, Violet #8B5CF6, Blue #3B82F6, Teal #14B8A6, Amber #F59E0B) -->
+    <!-- Application Structure Plan: A scrollable, single-page infographic format. It begins with the problem context (the fragmented stack), moves into a macro view of the tool landscape (Donut Chart), dives into the critical integration capabilities (Stacked Bar Chart), compares top contenders across dimensions (Radar Chart), and concludes with actionable HTML-based recommendation cards. This linear flow guides the user from the high-level problem to a specific, data-backed decision. -->
+    <!-- Visualization & Content Choices: 
+        1. Tool Landscape -> Goal: Organize/Inform -> Donut Chart (Chart.js) -> Shows market segmentation clearly. NO SVG.
+        2. Integration Matrix -> Goal: Compare -> Stacked Bar Chart (Chart.js) -> Best for showing cumulative integration strength across the 3 core tools (Jira, QB, SF). NO SVG.
+        3. Capability Breakdown -> Goal: Compare -> Radar Chart (Chart.js) -> Ideal for multivariate comparison of top tools to show overlapping strengths. NO SVG.
+        4. Current Stack/Recommendations -> Goal: Inform -> Styled HTML/CSS Grid with Unicode -> Clean, readable, and avoids Mermaid/SVG. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .glass-card {
+            background: #FFFFFF;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border-top: 4px solid transparent;
+        }
+    </style>
+</head>
+<body class="antialiased pb-20">
+
+    <header class="bg-[#0F172A] text-white py-16 px-4 mb-12 shadow-xl border-b-4 border-[#EC4899]">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="text-6xl mb-4">🚀</div>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Stack Consolidation Analysis</h1>
+            <p class="text-xl text-gray-300 max-w-3xl mx-auto">Evaluating PSA and Resource Management tools to replace Everhour and unify Salesforce, QuickBooks, and Jira.</p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+
+        <section class="glass-card p-8 border-t-[#3B82F6]">
+            <h2 class="text-3xl font-bold mb-4 text-[#0F172A]">The Current Ecosystem & The Challenge</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                Before selecting a new tool, it is critical to understand the current technological footprint. Your organization currently relies on a fragmented stack. The primary challenge is finding a central Professional Services Automation (PSA) or Resource Management tool that can absorb the time-tracking functions of Everhour while seamlessly bridging the gap between your CRM, your financial software, and your development tracking tool without introducing double data entry.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 text-center">
+                <div class="p-6 bg-blue-50 rounded-xl border border-blue-100">
+                    <div class="text-3xl mb-2">☁️</div>
+                    <div class="font-bold text-blue-900">Salesforce</div>
+                    <div class="text-sm text-blue-700">CRM & Sales</div>
+                </div>
+                <div class="p-6 bg-green-50 rounded-xl border border-green-100">
+                    <div class="text-3xl mb-2">💵</div>
+                    <div class="font-bold text-green-900">QuickBooks</div>
+                    <div class="text-sm text-green-700">Invoicing & Finance</div>
+                </div>
+                <div class="p-6 bg-indigo-50 rounded-xl border border-indigo-100">
+                    <div class="text-3xl mb-2">🛠️</div>
+                    <div class="font-bold text-indigo-900">Jira</div>
+                    <div class="text-sm text-indigo-700">Dev & Issue Tracking</div>
+                </div>
+                <div class="p-6 bg-pink-50 rounded-xl border border-pink-200 relative overflow-hidden">
+                    <div class="absolute inset-0 bg-pink-100 opacity-50 flex items-center justify-center">
+                        <span class="text-pink-600 font-bold text-xl rotate-[-15deg] uppercase tracking-widest border-2 border-pink-600 px-2 py-1">Replacing</span>
+                    </div>
+                    <div class="text-3xl mb-2">⏱️</div>
+                    <div class="font-bold text-pink-900">Everhour</div>
+                    <div class="text-sm text-pink-700">Time Tracking</div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 italic text-center">The goal is to implement a central tool that connects to the first three blocks while eliminating the fourth.</p>
+        </section>
+
+        <section class="glass-card p-8 border-t-[#8B5CF6]">
+            <h2 class="text-3xl font-bold mb-4 text-[#0F172A]">The Market Landscape</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                The tools evaluated fall into three distinct categories. Understanding this categorization is essential because it dictates how heavy the implementation will be and what primary problem the tool attempts to solve. Lightweight tools focus purely on who is doing what, while heavy enterprise tools attempt to run the entire business lifecycle.
+            </p>
+
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="w-full lg:w-1/2">
+                    <div class="chart-container">
+                        <canvas id="landscapeChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 space-y-6">
+                    <div class="border-l-4 border-[#3B82F6] pl-4">
+                        <h3 class="font-bold text-lg text-[#0F172A]">Resource Management (Float, Runn)</h3>
+                        <p class="text-gray-600 text-sm">Highly visual tools prioritizing scheduling and capacity. They integrate well with Jira but have lighter financial syncing with QuickBooks.</p>
+                    </div>
+                    <div class="border-l-4 border-[#8B5CF6] pl-4">
+                        <h3 class="font-bold text-lg text-[#0F172A]">Modern PSA (Ruddr, Rocketlane, Forecast)</h3>
+                        <p class="text-gray-600 text-sm">The middle ground. They offer solid resource planning combined with strong time tracking and direct financial integrations. Forecast adds AI-driven Jira syncing.</p>
+                    </div>
+                    <div class="border-l-4 border-[#EC4899] pl-4">
+                        <h3 class="font-bold text-lg text-[#0F172A]">Enterprise / Heavy (Accelo, ERPNext)</h3>
+                        <p class="text-gray-600 text-sm">Massive, comprehensive platforms designed to be your single source of truth. Highly capable but require immense setup time and process changes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card p-8 border-t-[#14B8A6]">
+            <h2 class="text-3xl font-bold mb-4 text-[#0F172A]">Integration Strength Matrix</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                A tool is only as good as its ability to talk to your existing stack. This chart quantifies the native integration strength of each evaluated platform against your non-negotiable tools: Jira, QuickBooks, and Salesforce. A score of 3 indicates a strong, bi-directional native sync, while a 1 indicates reliance on third-party connectors like Zapier or very basic one-way pushes.
+            </p>
+
+            <div class="chart-container">
+                <canvas id="integrationChart"></canvas>
+            </div>
+            
+            <p class="text-sm text-gray-600 mt-6 text-center bg-teal-50 p-4 rounded-lg">
+                <strong>Key Takeaway:</strong> Notice how <span class="font-bold text-[#14B8A6]">Accelo</span> and <span class="font-bold text-[#14B8A6]">Forecast.app</span> lead in raw integration capabilities. Accelo connects deeply to sales and finance, while Forecast has unparalleled bi-directional synchronization with Jira.
+            </p>
+        </section>
+
+        <section class="glass-card p-8 border-t-[#F59E0B]">
+            <h2 class="text-3xl font-bold mb-4 text-[#0F172A]">Multivariate Capability Breakdown</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                To make a final decision, we must weigh feature sets against ease of use and overall value for a small-to-medium business. This radar chart plots the top four contenders across five critical dimensions. It reveals the inherent trade-offs between choosing a lightweight, user-friendly tool versus a heavy, feature-rich enterprise solution.
+            </p>
+
+            <div class="chart-container" style="max-width: 600px;">
+                <canvas id="capabilityChart"></canvas>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-[#F59E0B] flex items-center gap-2"><span>⚖️</span> Trade-off Analysis</h4>
+                    <p class="text-sm text-gray-700 mt-2"><strong>Accelo</strong> scores perfectly on integrations but severely drops in "Value for SMB" and "Ease of Use" due to its complexity. Conversely, <strong>Runn</strong> is incredibly easy to use but lacks the deep financial linking of a full PSA.</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h4 class="font-bold text-[#F59E0B] flex items-center gap-2"><span>🎯</span> The Sweet Spot</h4>
+                    <p class="text-sm text-gray-700 mt-2"><strong>Ruddr</strong> and <strong>Forecast.app</strong> provide the most balanced shapes, offering robust integrations while maintaining a user interface that won't overwhelm a smaller team migrating off Everhour.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card p-8 border-t-[#0F172A]">
+            <h2 class="text-3xl font-bold mb-4 text-[#0F172A]">Strategic Recommendations</h2>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                Based on the data visualized above, the decision rests on your organization's primary pain point. If development alignment is critical, go Jira-first. If financial consolidation is key, adopt a Modern PSA. Below are the tailored recommendations based on specific business postures.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white border-2 border-[#8B5CF6] rounded-xl p-6 hover:-translate-y-1 transition-transform shadow-sm">
+                    <div class="text-4xl mb-4">🧩</div>
+                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">The Balanced Approach</h3>
+                    <div class="inline-block bg-[#8B5CF6] text-white text-xs font-bold px-3 py-1 rounded-full mb-4">Recommend: Ruddr</div>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>✔️ Easily replaces Everhour</li>
+                        <li>✔️ Strong QuickBooks integration</li>
+                        <li>✔️ Right-sized pricing for SMBs</li>
+                        <li>❌ Jira sync is good, but not bi-directional</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white border-2 border-[#3B82F6] rounded-xl p-6 hover:-translate-y-1 transition-transform shadow-sm">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">The Jira-First Approach</h3>
+                    <div class="inline-block bg-[#3B82F6] text-white text-xs font-bold px-3 py-1 rounded-full mb-4">Recommend: Forecast.app</div>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>✔️ Best-in-class Jira bi-directional sync</li>
+                        <li>✔️ AI-assisted resource scheduling</li>
+                        <li>✔️ Connects cleanly to QuickBooks</li>
+                        <li>❌ Can become expensive as you scale</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white border-2 border-[#EC4899] rounded-xl p-6 hover:-translate-y-1 transition-transform shadow-sm">
+                    <div class="text-4xl mb-4">🏢</div>
+                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">The Enterprise Shift</h3>
+                    <div class="inline-block bg-[#EC4899] text-white text-xs font-bold px-3 py-1 rounded-full mb-4">Recommend: Accelo</div>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>✔️ Replaces Everhour, potentially overlaps Salesforce</li>
+                        <li>✔️ Ultimate deep integration with QB/SF</li>
+                        <li>✔️ Single source of truth for entire agency</li>
+                        <li>❌ Requires massive implementation effort</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function wrapLabels(labels) {
+            return labels.map(label => {
+                if (label.length <= 16) return label;
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + word).length > 16) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                });
+                if (currentLine) lines.push(currentLine.trim());
+                return lines;
+            });
+        }
+
+        const standardTooltipPlugin = {
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleFont: { family: 'Poppins', size: 14, weight: 'bold' },
+                bodyFont: { family: 'Poppins', size: 13 },
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            }
+        };
+
+        const landscapeCtx = document.getElementById('landscapeChart').getContext('2d');
+        const landscapeLabels = wrapLabels(['Resource Management (Lightweight)', 'Modern PSA (Balanced)', 'Enterprise Systems (Heavy)']);
+        new Chart(landscapeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: landscapeLabels,
+                datasets: [{
+                    data: [2, 3, 2],
+                    backgroundColor: ['#3B82F6', '#8B5CF6', '#EC4899'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Poppins' }, padding: 20 }
+                    },
+                    ...standardTooltipPlugin
+                },
+                cutout: '65%'
+            }
+        });
+
+        const integrationCtx = document.getElementById('integrationChart').getContext('2d');
+        const integrationLabelsRaw = ['Float', 'Runn', 'Ruddr', 'Rocketlane', 'Forecast.app', 'Accelo', 'ERPNext'];
+        new Chart(integrationCtx, {
+            type: 'bar',
+            data: {
+                labels: wrapLabels(integrationLabelsRaw),
+                datasets: [
+                    {
+                        label: 'Jira Integration',
+                        data: [3, 3, 2, 2, 3, 3, 1],
+                        backgroundColor: '#3B82F6'
+                    },
+                    {
+                        label: 'QuickBooks Sync',
+                        data: [1, 2, 3, 3, 3, 3, 1],
+                        backgroundColor: '#14B8A6'
+                    },
+                    {
+                        label: 'Salesforce Link',
+                        data: [1, 2, 2, 3, 2, 3, 1],
+                        backgroundColor: '#F59E0B'
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: { font: { family: 'Poppins' } }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        max: 10,
+                        grid: { color: '#E2E8F0' },
+                        ticks: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { family: 'Poppins' } } },
+                    ...standardTooltipPlugin
+                }
+            }
+        });
+
+        const capabilityCtx = document.getElementById('capabilityChart').getContext('2d');
+        const capabilityLabelsRaw = ['Jira Bi-Directional Sync', 'Financial/QB Capability', 'Feature Depth', 'Resource Visualization', 'Value for SMB / Ease'];
+        new Chart(capabilityCtx, {
+            type: 'radar',
+            data: {
+                labels: wrapLabels(capabilityLabelsRaw),
+                datasets: [
+                    {
+                        label: 'Runn',
+                        data: [9, 5, 6, 10, 9],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3B82F6',
+                        pointBackgroundColor: '#3B82F6'
+                    },
+                    {
+                        label: 'Ruddr',
+                        data: [7, 9, 8, 8, 9],
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        borderColor: '#8B5CF6',
+                        pointBackgroundColor: '#8B5CF6'
+                    },
+                    {
+                        label: 'Forecast.app',
+                        data: [10, 8, 8, 8, 6],
+                        backgroundColor: 'rgba(20, 184, 166, 0.2)',
+                        borderColor: '#14B8A6',
+                        pointBackgroundColor: '#14B8A6'
+                    },
+                    {
+                        label: 'Accelo',
+                        data: [8, 10, 10, 6, 4],
+                        backgroundColor: 'rgba(236, 72, 153, 0.2)',
+                        borderColor: '#EC4899',
+                        pointBackgroundColor: '#EC4899'
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                elements: {
+                    line: { borderWidth: 3 }
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: '#E2E8F0' },
+                        grid: { color: '#E2E8F0' },
+                        pointLabels: { font: { family: 'Poppins', size: 11 }, color: '#475569' },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { family: 'Poppins' }, padding: 20 } },
+                    ...standardTooltipPlugin
+                }
+            }
+        });
+    </script>
+</body>
+</html>

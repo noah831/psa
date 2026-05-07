@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSA & Resource Management Tool Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Sand & Teal -->
+    <!-- Application Structure Plan: The SPA uses a dashboard-style layout with a persistent sidebar (or top nav on mobile) for seamless navigation between logical sections: 'Executive Summary', 'Integration Matrix' (crucial for the user's specific tech stack), 'Detailed Comparison' (side-by-side pros/cons), and 'Final Recommendations'. This prevents cognitive overload and allows the user to explore high-level visual data first, then drill down into specific tool details. -->
+    <!-- Visualization & Content Choices: 
+        1. Radar Chart (Chart.js): Used in Summary to compare tools across 5 key dimensions (UI, Integrations, Features, Value, Setup). Goal: Compare.
+        2. Integration Matrix (HTML Table): Directly maps the tools against the user's specific stack (Salesforce, QB, Jira, Everhour). Goal: Inform/Compare.
+        3. Interactive Grid (HTML/JS): Displays tool details (pros/cons). Clicking a tool isolates its view. Goal: Organize/Inform. 
+        All choices avoid SVG/Mermaid as requested. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #fafaf9; color: #292524; }
+        .chart-container { position: relative; width: 100%; max-width: 700px; margin-left: auto; margin-right: auto; height: 350px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        .hide { display: none !important; }
+        .tab-active { background-color: #0d9488; color: #ffffff; border-color: #0d9488; }
+        .tab-inactive { background-color: transparent; color: #57534e; border-color: #d6d3d1; }
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row min-h-screen">
+
+    <nav class="w-full md:w-64 bg-stone-100 border-b md:border-r border-stone-200 flex-shrink-0 z-10 sticky top-0 h-auto md:h-screen overflow-y-auto">
+        <div class="p-6">
+            <h1 class="text-2xl font-bold text-stone-800 tracking-tight mb-2">&#11020; StackSync</h1>
+            <p class="text-xs text-stone-500 uppercase font-semibold tracking-wider mb-8">PSA Analysis Report</p>
+            
+            <div class="space-y-2" id="nav-buttons">
+                <button data-target="view-summary" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all tab-active">&#128202; Executive Summary</button>
+                <button data-target="view-matrix" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all tab-inactive">&#128295; Integration Matrix</button>
+                <button data-target="view-comparison" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all tab-inactive">&#128269; Detailed Comparison</button>
+                <button data-target="view-recommendations" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-sm font-medium transition-all tab-inactive">&#128161; Recommendations</button>
+            </div>
+
+            <div class="mt-12 p-4 bg-white rounded-xl border border-stone-200 shadow-sm">
+                <h3 class="text-xs font-bold text-stone-400 uppercase mb-3">Current Stack</h3>
+                <div class="flex flex-wrap gap-2 text-xs font-medium text-stone-600">
+                    <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded">&#9729; Salesforce</span>
+                    <span class="px-2 py-1 bg-green-50 text-green-700 rounded">&#128181; QuickBooks</span>
+                    <span class="px-2 py-1 bg-indigo-50 text-indigo-700 rounded">&#128203; Jira</span>
+                    <span class="px-2 py-1 bg-stone-100 text-stone-700 rounded">&#9201; Everhour</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto w-full relative">
+
+        <section id="view-summary" class="view-section transition-all duration-500 opacity-100 translate-y-0">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <h2 class="text-3xl font-bold text-stone-800 mb-3">Executive Summary</h2>
+                <p class="text-stone-600 max-w-3xl leading-relaxed">
+                    This section provides a high-level visual overview of the researched Professional Services Automation (PSA) and Resource Management tools. We evaluated the requested tools (Float, Runn, Ruddr, Rocketlane, Accelo) and added two alternatives: <strong>Forecast.app</strong> (for strong Jira AI integration) and <strong>ERPNext</strong> (Open Source alternative). The radar chart below scores them across five critical dimensions for your small business.
+                </p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-stone-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold text-stone-800">Capability Assessment</h3>
+                        <div class="text-sm text-stone-500 italic">Toggle tools to compare</div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2 mb-6" id="chart-toggles">
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-teal-50 p-6 rounded-2xl border border-teal-100">
+                        <h4 class="text-teal-900 font-bold mb-2">&#9888; The Integration Challenge</h4>
+                        <p class="text-sm text-teal-800">Your stack combines enterprise CRM (Salesforce) with agile dev (Jira) and lightweight time/finance (Everhour/QB). Most tools excel at 2 or 3 of these, but rarely all 4 seamlessly. The goal is replacing Everhour or integrating deeply with Jira to prevent double-entry.</p>
+                    </div>
+                    
+                    <div class="glass-panel p-6 rounded-2xl shadow-sm">
+                        <h4 class="text-stone-800 font-bold mb-4">Key Market Findings</h4>
+                        <ul class="space-y-3 text-sm text-stone-600">
+                            <li class="flex items-start"><span class="text-teal-600 mr-2">&#10003;</span> <strong>Resource vs. PSA:</strong> Float and Runn are lightweight resource planners. Ruddr, Accelo, and Rocketlane are full PSAs trying to manage financials too.</li>
+                            <li class="flex items-start"><span class="text-teal-600 mr-2">&#10003;</span> <strong>The Jira Factor:</strong> Tools that sync bi-directionally with Jira (like Forecast or Runn) reduce friction drastically for development teams.</li>
+                            <li class="flex items-start"><span class="text-teal-600 mr-2">&#10003;</span> <strong>Cost of Complexity:</strong> Accelo handles everything but requires significant setup time and administration overhead for a small company.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-matrix" class="view-section hide opacity-0 translate-y-4">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <h2 class="text-3xl font-bold text-stone-800 mb-3">Integration Matrix</h2>
+                <p class="text-stone-600 max-w-3xl leading-relaxed">
+                    A crucial requirement is fitting into your existing workflow. This section breaks down how natively each tool integrates with your current stack. A seamless integration prevents data silos and administrative burden.
+                </p>
+            </header>
+
+            <div class="overflow-x-auto bg-white rounded-2xl border border-stone-200 shadow-sm">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-stone-50 text-stone-600 font-semibold border-b border-stone-200">
+                        <tr>
+                            <th class="p-4">Tool</th>
+                            <th class="p-4 text-center">Jira</th>
+                            <th class="p-4 text-center">QuickBooks</th>
+                            <th class="p-4 text-center">Salesforce</th>
+                            <th class="p-4 text-center">Replaces Everhour?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100 text-stone-700" id="matrix-body">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 flex justify-center gap-6 text-sm text-stone-500">
+                <span><span class="text-green-500 font-bold">&#11044;</span> Native / Strong</span>
+                <span><span class="text-yellow-500 font-bold">&#11044;</span> via Zapier / Basic</span>
+                <span><span class="text-red-400 font-bold">&#11044;</span> Weak / None</span>
+            </div>
+        </section>
+
+        <section id="view-comparison" class="view-section hide opacity-0 translate-y-4">
+            <header class="mb-8 border-b border-stone-200 pb-6 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-800 mb-3">Detailed Comparison</h2>
+                    <p class="text-stone-600 max-w-3xl leading-relaxed">
+                        Explore the specific strengths, weaknesses, and ideal use cases for each tool. We have categorized them by their primary focus to help you understand where they fit in the market.
+                    </p>
+                </div>
+                <div class="hidden md:block">
+                    <select id="tool-filter" class="bg-white border border-stone-300 text-stone-700 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5">
+                        <option value="All">All Categories</option>
+                        <option value="Resource Management">Resource Management</option>
+                        <option value="Modern PSA">Modern PSA</option>
+                        <option value="Enterprise/Heavy">Enterprise/Heavy</option>
+                        <option value="Open Source">Open Source</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="comparison-grid">
+            </div>
+        </section>
+
+        <section id="view-recommendations" class="view-section hide opacity-0 translate-y-4">
+            <header class="mb-8 border-b border-stone-200 pb-6">
+                <h2 class="text-3xl font-bold text-stone-800 mb-3">Final Recommendations</h2>
+                <p class="text-stone-600 max-w-3xl leading-relaxed">
+                    Based on your specific stack (Salesforce, QuickBooks, Jira, Everhour) and size, there is no single "silver bullet." The right choice depends on what pain point is most acute for your business right now. Here are three tailored paths.
+                </p>
+            </header>
+
+            <div class="space-y-6">
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-l-4 border-teal-500 transition hover:shadow-md">
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">&#127919; Recommendation 1: The Pragmatic Upgrade (Runn or Ruddr)</h3>
+                    <p class="text-stone-600 mb-4"><strong>Scenario:</strong> You want to replace Everhour, get better forecasting, but keep Jira as your source of truth for dev work.</p>
+                    <div class="bg-stone-50 p-4 rounded-lg text-sm text-stone-700">
+                        <strong>Why:</strong> <strong>Ruddr</strong> is an excellent lightweight PSA that integrates with QB and Salesforce and has a solid Jira sync. It handles time/billing natively. <strong>Runn</strong> is arguably the best visual resource planner right now, integrates nicely with Jira, but its financial features are lighter than Ruddr's.
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-l-4 border-blue-500 transition hover:shadow-md">
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">&#128640; Recommendation 2: The Enterprise Consolidator (Accelo)</h3>
+                    <p class="text-stone-600 mb-4"><strong>Scenario:</strong> You are tired of having 4 different tools and want to run the entire business (from sales quote to final invoice) in one system.</p>
+                    <div class="bg-stone-50 p-4 rounded-lg text-sm text-stone-700">
+                        <strong>Why:</strong> <strong>Accelo</strong> integrates deeply with Salesforce and QuickBooks. It can completely absorb the functions of Everhour and potentially handle much of what you do in Jira (if you are willing to migrate). It is heavy and expensive, but provides a single pane of glass.
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border-l-4 border-amber-500 transition hover:shadow-md">
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">&#129302; Recommendation 3: The Jira-First Approach (Forecast.app)</h3>
+                    <p class="text-stone-600 mb-4"><strong>Scenario:</strong> Jira is non-negotiable and heavily used. You need a tool that sits on top of Jira to provide the resource and financial layers that Jira lacks.</p>
+                    <div class="bg-stone-50 p-4 rounded-lg text-sm text-stone-700">
+                        <strong>Why:</strong> <strong>Forecast</strong> has one of the best bi-directional Jira integrations on the market. It pulls in Jira issues, applies AI for auto-scheduling resources, and connects to QB for billing. It bridges the gap perfectly without disrupting the dev team.
+                    </div>
+                </div>
+
+                <div class="bg-stone-100 p-6 rounded-2xl border border-stone-200 mt-8">
+                    <h4 class="font-bold text-stone-800 mb-2">A Note on Open Source (ERPNext/Odoo)</h4>
+                    <p class="text-sm text-stone-600">While open-source tools like ERPNext are powerful and free from licensing costs, they require significant technical resources to configure, maintain, and build integrations (like a custom Jira sync). For a small company, the hidden cost of maintenance usually outweighs the SaaS subscription savings unless you have a dedicated internal IT/DevOps person with spare capacity.</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const toolData = [
+            {
+                name: "Float",
+                type: "Resource Management",
+                desc: "Highly visual resource scheduling and capacity planning. Excellent UI but lacks deep financial PSA features.",
+                pros: ["Industry-leading visual scheduler", "Very easy adoption", "Good native Jira integration"],
+                cons: ["Not a full PSA (weak billing/invoicing)", "Salesforce/QB integration relies heavily on Zapier", "Cannot fully replace Everhour if advanced billing is needed"],
+                integrations: { jira: "Strong", qb: "Weak", sf: "Weak", replacesEH: "Partial" },
+                scores: [9, 6, 9, 3, 7] 
+            },
+            {
+                name: "Runn",
+                type: "Resource Management",
+                desc: "Modern capacity planning and forecasting tool with basic financial tracking. Fast growing.",
+                pros: ["Beautiful, modern interface", "Excellent scenario planning and forecasting", "Strong Jira bi-directional sync"],
+                cons: ["Newer platform, some enterprise features missing", "Invoice generation is basic compared to full PSAs"],
+                integrations: { jira: "Strong", qb: "Basic", sf: "Basic", replacesEH: "Yes" },
+                scores: [9, 7, 8, 5, 8]
+            },
+            {
+                name: "Ruddr",
+                type: "Modern PSA",
+                desc: "Built specifically for modern professional services. Clean UI that handles time, billing, and resources.",
+                pros: ["Great balance of resource management and financials", "Strong Quickbooks and Slack integrations", "Built-in time tracking replaces Everhour easily"],
+                cons: ["Less customizable than enterprise tools", "Brand recognition is lower, smaller community"],
+                integrations: { jira: "Basic", qb: "Strong", sf: "Basic", replacesEH: "Yes" },
+                scores: [8, 8, 7, 8, 9]
+            },
+            {
+                name: "Rocketlane",
+                type: "Modern PSA",
+                desc: "Focused heavily on client onboarding and collaborative project delivery. Client portal is a massive differentiator.",
+                pros: ["Exceptional client-facing portal", "Strong native time tracking", "Good Salesforce integration for handoffs"],
+                cons: ["Resource management is secondary to project management", "Can feel redundant if you already heavily rely on Jira for PM"],
+                integrations: { jira: "Basic", qb: "Strong", sf: "Strong", replacesEH: "Yes" },
+                scores: [8, 8, 6, 7, 7]
+            },
+            {
+                name: "Accelo",
+                type: "Enterprise/Heavy",
+                desc: "End-to-end PSA covering sales, projects, retainers, and ticketing. Powerful but complex.",
+                pros: ["Comprehensive: does literally everything", "Deep Salesforce and Quickbooks native integrations", "Strong automated time tracking"],
+                cons: ["Very steep learning curve", "Clunky UI compared to modern alternatives", "Expensive for a small company"],
+                integrations: { jira: "Strong", qb: "Strong", sf: "Strong", replacesEH: "Yes" },
+                scores: [4, 10, 8, 10, 5]
+            },
+            {
+                name: "Forecast.app",
+                type: "Modern PSA",
+                desc: "AI-driven resource and project management tool designed to sit on top of execution tools like Jira.",
+                pros: ["Top-tier bi-directional Jira integration", "AI assists with auto-scheduling resources", "Solid financial reporting and QBO sync"],
+                cons: ["Pricing can escalate quickly", "Setup requires strict adherence to their methodology for AI to work"],
+                integrations: { jira: "Strong", qb: "Strong", sf: "Basic", replacesEH: "Yes" },
+                scores: [7, 9, 8, 8, 6]
+            },
+            {
+                name: "ERPNext",
+                type: "Open Source",
+                desc: "A completely free, open-source modular ERP system that includes project and timesheet modules.",
+                pros: ["No licensing fees", "Infinitely customizable", "Has modules for literally every business function"],
+                cons: ["High implementation cost/time", "Integrations require custom API work or third-party connectors", "UI is generic"],
+                integrations: { jira: "Weak", qb: "Weak", sf: "Weak", replacesEH: "Yes" },
+                scores: [5, 4, 7, 7, 8]
+            }
+        ];
+
+        let radarChartInstance = null;
+        let selectedToolsForChart = ['Float', 'Runn', 'Accelo', 'Forecast.app']; 
+
+        const colorPalette = [
+            { bg: 'rgba(13, 148, 136, 0.2)', border: '#0d9488' }, 
+            { bg: 'rgba(245, 158, 11, 0.2)', border: '#f59e0b' }, 
+            { bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6' }, 
+            { bg: 'rgba(139, 92, 246, 0.2)', border: '#8b5cf6' },
+            { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444' },
+            { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981' },
+            { bg: 'rgba(100, 116, 139, 0.2)', border: '#64748b' }
+        ];
+
+        function initNavigation() {
+            const buttons = document.querySelectorAll('.nav-btn');
+            const sections = document.querySelectorAll('.view-section');
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    buttons.forEach(b => {
+                        b.classList.remove('tab-active');
+                        b.classList.add('tab-inactive');
+                    });
+                    e.target.classList.add('tab-active');
+                    e.target.classList.remove('tab-inactive');
+
+                    const targetId = e.target.getAttribute('data-target');
+                    
+                    sections.forEach(sec => {
+                        sec.classList.remove('opacity-100', 'translate-y-0');
+                        sec.classList.add('opacity-0', 'translate-y-4');
+                        
+                        setTimeout(() => {
+                            if(sec.id !== targetId) {
+                                sec.classList.add('hide');
+                            }
+                        }, 300);
+                    });
+
+                    setTimeout(() => {
+                        const targetSec = document.getElementById(targetId);
+                        targetSec.classList.remove('hide');
+                        setTimeout(() => {
+                            targetSec.classList.remove('opacity-0', 'translate-y-4');
+                            targetSec.classList.add('opacity-100', 'translate-y-0');
+                        }, 50);
+                    }, 300);
+                });
+            });
+        }
+
+        function renderMatrix() {
+            const tbody = document.getElementById('matrix-body');
+            tbody.innerHTML = '';
+
+            const getDot = (level) => {
+                if(level === 'Strong' || level === 'Yes') return '<span class="text-green-500 text-xl">&#11044;</span>';
+                if(level === 'Basic' || level === 'Partial') return '<span class="text-yellow-500 text-xl">&#11044;</span>';
+                return '<span class="text-red-400 text-xl">&#11044;</span>';
+            };
+
+            toolData.forEach(tool => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-stone-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 font-medium text-stone-800">${tool.name} <span class="block text-xs text-stone-400 font-normal">${tool.type}</span></td>
+                    <td class="p-4 text-center">${getDot(tool.integrations.jira)}</td>
+                    <td class="p-4 text-center">${getDot(tool.integrations.qb)}</td>
+                    <td class="p-4 text-center">${getDot(tool.integrations.sf)}</td>
+                    <td class="p-4 text-center">${getDot(tool.integrations.replacesEH)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderComparisonCards(filter = 'All') {
+            const grid = document.getElementById('comparison-grid');
+            grid.innerHTML = '';
+
+            const filteredData = filter === 'All' ? toolData : toolData.filter(t => t.type === filter);
+
+            filteredData.forEach((tool, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-2xl border border-stone-200 shadow-sm hover:shadow-md transition-all flex flex-col h-full";
+                
+                let prosHtml = tool.pros.map(p => `<li class="flex items-start mb-1"><span class="text-green-500 mr-2 shrink-0">&#10003;</span><span>${p}</span></li>`).join('');
+                let consHtml = tool.cons.map(c => `<li class="flex items-start mb-1"><span class="text-red-400 mr-2 shrink-0">&#10007;</span><span>${c}</span></li>`).join('');
+
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <span class="px-2 py-1 bg-stone-100 text-stone-600 text-xs font-semibold rounded-full uppercase tracking-wider">${tool.type}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">${tool.name}</h3>
+                    <p class="text-sm text-stone-600 mb-6 flex-grow">${tool.desc}</p>
+                    
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <h4 class="font-semibold text-stone-800 mb-2 border-b border-stone-100 pb-1">Strengths</h4>
+                            <ul class="text-stone-600">${prosHtml}</ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-stone-800 mb-2 border-b border-stone-100 pb-1">Weaknesses</h4>
+                            <ul class="text-stone-600">${consHtml}</ul>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function initFilter() {
+            const filter = document.getElementById('tool-filter');
+            if(filter) {
+                filter.addEventListener('change', (e) => {
+                    renderComparisonCards(e.target.value);
+                });
+            }
+        }
+
+        function renderChartToggles() {
+            const container = document.getElementById('chart-toggles');
+            container.innerHTML = '';
+
+            toolData.forEach((tool, index) => {
+                const isSelected = selectedToolsForChart.includes(tool.name);
+                const btn = document.createElement('button');
+                btn.className = `px-3 py-1 text-xs font-medium rounded-full border transition-colors ${isSelected ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-300 hover:border-stone-500'}`;
+                btn.innerText = tool.name;
+                
+                btn.addEventListener('click', () => {
+                    if (selectedToolsForChart.includes(tool.name)) {
+                        selectedToolsForChart = selectedToolsForChart.filter(t => t !== tool.name);
+                    } else {
+                        if(selectedToolsForChart.length >= 4) {
+                            selectedToolsForChart.shift(); 
+                        }
+                        selectedToolsForChart.push(tool.name);
+                    }
+                    renderChartToggles();
+                    updateChart();
+                });
+                
+                container.appendChild(btn);
+            });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            const datasets = toolData
+                .filter(t => selectedToolsForChart.includes(t.name))
+                .map((tool) => {
+                    const originalIndex = toolData.findIndex(t => t.name === tool.name);
+                    const colors = colorPalette[originalIndex % colorPalette.length];
+                    return {
+                        label: tool.name,
+                        data: tool.scores,
+                        fill: true,
+                        backgroundColor: colors.bg,
+                        borderColor: colors.border,
+                        pointBackgroundColor: colors.border,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: colors.border
+                    };
+                });
+
+            if (radarChartInstance) {
+                radarChartInstance.data.datasets = datasets;
+                radarChartInstance.update();
+            } else {
+                radarChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Ease of Use', 'Integrations (Your Stack)', 'Resource Planning', 'Financials/Billing', 'Value for SMB'],
+                        datasets: datasets
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        elements: {
+                            line: { borderWidth: 2 }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: { color: 'rgba(0, 0, 0, 0.05)' },
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                pointLabels: { font: { family: 'Inter', size: 12, weight: '500' }, color: '#57534e' },
+                                ticks: { display: false, min: 0, max: 10 }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { font: { family: 'Inter', size: 12 }, usePointStyle: true, padding: 20 }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(41, 37, 36, 0.9)',
+                                titleFont: { family: 'Inter', size: 14 },
+                                bodyFont: { family: 'Inter', size: 13 },
+                                padding: 12,
+                                cornerRadius: 8
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            renderMatrix();
+            renderComparisonCards();
+            initFilter();
+            renderChartToggles();
+            updateChart();
+        });
+
+    </script>
+</body>
+</html>
